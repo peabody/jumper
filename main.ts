@@ -128,21 +128,20 @@ game.onUpdate(function () {
         }
     }
 })
+// Jump Logic. Longer A is held, higher the jump.
 forever(function () {
     if (controller.A.isPressed()) {
         if (!(jumping)) {
             jumping = true
+            jumptime = game.runtime()
             player1.vy = -150
         } else {
-            if (jumptime > 7 * 1) {
-            	
-            } else {
+            if (!(game.runtime() - jumptime > 180)) {
                 player1.vy = -150
-                jumptime += 1
             }
         }
     } else {
-        jumptime = 1000
+        jumptime = 0
     }
     if (player1.isHittingTile(CollisionDirection.Bottom)) {
         jumptime = 0
