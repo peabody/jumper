@@ -2,7 +2,7 @@ namespace SpriteKind {
     export const Thing = SpriteKind.create()
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`end-flag-tile`, function (sprite, location) {
-    game.over(true)
+    nextLevel()
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     music.pewPew.play()
@@ -33,6 +33,33 @@ function spawnEnemies () {
         meanie.vx = -50
     }
 }
+function nextLevel () {
+    info.setLife(3)
+    destroySprites()
+    scene.setBackgroundColor(9)
+    scene.setBackgroundImage(assets.image`Forest`)
+    p1_direction = 1
+    invincible = 0
+    invisible = false
+    jumptime = 0
+    jumping = false
+    if (currentLevel == 0) {
+        tiles.setTilemap(tilemap`level1`)
+    } else if (currentLevel == 1) {
+        game.splash("Level 2 Start!")
+        tiles.setTilemap(tilemap`level2`)
+    } else {
+        game.over(true)
+    }
+    spawnEnemies()
+    tiles.placeOnRandomTile(player1, sprites.swamp.swampTile1)
+    currentLevel += 1
+}
+function destroySprites () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        value.destroy()
+    }
+}
 // Enemy kill and hurt logic
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (sprite.bottom < otherSprite.y) {
@@ -49,25 +76,19 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         }
     }
 })
+let currentLevel = 0
+let jumping = false
+let jumptime = 0
+let invisible = false
 let invincible = 0
-let p1_direction = 0
 let meanie: Sprite = null
+let p1_direction = 0
 let player1: Sprite = null
 player1 = sprites.create(assets.image`Tommy`, SpriteKind.Player)
 player1.z = 100
 player1.ay = 500
 controller.moveSprite(player1, 100, 0)
-scene.setBackgroundColor(9)
-tiles.setTilemap(tilemap`level1`)
-scene.setBackgroundImage(assets.image`Forest`)
-tiles.placeOnRandomTile(player1, sprites.swamp.swampTile1)
-tiles.placeOnTile(meanie, tiles.getTileLocation(10, 13))
-p1_direction = 1
-invincible = 0
-let invisible = false
-let jumptime = 0
-let jumping = false
-spawnEnemies()
+nextLevel()
 game.onUpdate(function () {
     if (Math.abs(player1.vx) == 0) {
         if (p1_direction == 1) {
