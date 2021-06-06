@@ -1,5 +1,12 @@
 namespace SpriteKind {
     export const Thing = SpriteKind.create()
+    export const platform = SpriteKind.create()
+}
+function placeMovingPlatforms () {
+    for (let value of tiles.getTilesByType(sprites.dungeon.floorLight2)) {
+        platform = sprites.create(assets.image`platform`, SpriteKind.platform)
+        tiles.setTileAt(value, assets.tile`transparency16`)
+    }
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`end-flag-tile`, function (sprite, location) {
     nextLevel()
@@ -52,9 +59,13 @@ function nextLevel () {
         game.over(true)
     }
     spawnEnemies()
+    placeMovingPlatforms()
     tiles.placeOnRandomTile(player1, sprites.swamp.swampTile1)
     currentLevel += 1
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.platform, function (sprite, otherSprite) {
+    sprite.bottom = otherSprite.top
+})
 function destroySprites () {
     for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
         value.destroy()
@@ -83,6 +94,7 @@ let invisible = false
 let invincible = 0
 let meanie: Sprite = null
 let p1_direction = 0
+let platform: Sprite = null
 let player1: Sprite = null
 player1 = sprites.create(assets.image`Tommy`, SpriteKind.Player)
 player1.z = 100
